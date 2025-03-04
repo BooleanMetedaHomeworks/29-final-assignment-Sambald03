@@ -110,9 +110,7 @@ namespace ristorante_backend.Repositories
                 {
                     try
                     {
-                        cmd.Connection = conn;
                         cmd.Transaction = transaction;
-                        cmd.CommandText = query;
 
                         cmd.Parameters.Add(new SqlParameter("@name", Dish.Name));
                         cmd.Parameters.Add(new SqlParameter("@description", Dish.Description ?? (object)DBNull.Value));
@@ -121,7 +119,10 @@ namespace ristorante_backend.Repositories
 
                         int dishId = Convert.ToInt32(await cmd.ExecuteScalarAsync());
 
-                        await HandleIngredients(Dish.MenuIds, dishId, conn); // -> TODO
+                        if (Dish.MenuIds.Any() || Dish.MenuIds != null)
+                        {
+                            await AddDishMenus(dishId, Dish.MenuIds, conn);
+                        }
 
                         await transaction.CommitAsync();
 
@@ -136,7 +137,7 @@ namespace ristorante_backend.Repositories
             }
         }
 
-        public async Task<int> UpdatePizza(int id, Dish Dish)
+        public async Task<int> UpdateDish(int pizzaId, Dish Dish)
         {
             var query = $"UPDATE Pizzas SET Name = @name, Description = @description, Price = @price, CategoryId = @categoryId WHERE id = @id";
 
@@ -149,15 +150,23 @@ namespace ristorante_backend.Repositories
                 {
                     try
                     {
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-                        cmd.Parameters.Add(new SqlParameter("@name", Pizza.Name));
-                        cmd.Parameters.Add(new SqlParameter("@description", Pizza.Description));
-                        cmd.Parameters.Add(new SqlParameter("@price", Pizza.Price));
-                        cmd.Parameters.Add(new SqlParameter("@categoryId", Pizza.CategoryId ?? (object)DBNull.Value));
+                        cmd.Transaction = transaction;
+
+                        cmd.Parameters.Add(new SqlParameter("@id", pizzaId));
+                        cmd.Parameters.Add(new SqlParameter("@name", Dish.Name));
+                        cmd.Parameters.Add(new SqlParameter("@description", Dish.Description ?? (object)DBNull.Value));
+                        cmd.Parameters.Add(new SqlParameter("@price", Dish.Price));
+                        cmd.Parameters.Add(new SqlParameter("@categoryId", Dish.CategoryId ?? (object)DBNull.Value));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
 
-                        await HandleIngredients(Pizza.IngredientIds, id, conn);
+                        if (Dish.MenuIds.Any() || Dish.MenuIds != null)
+                        {
+                            await RemoveDishMenus(pizzaId, conn);
+                            await AddDishMenus(pizzaId, Dish.MenuIds, conn);
+                        }
+
+                        await transaction.CommitAsync();
 
                         return rowsAffected;
                     }
@@ -170,90 +179,63 @@ namespace ristorante_backend.Repositories
             }
         }
 
-        public async Task<int> DeletePizza(int id)
+        public async Task<int> DeleteDish(int id)
         {
-            using var conn = new SqlConnection(CONNECTION_STRING);
-            await conn.OpenAsync();
-
             var query = $"DELETE FROM Pizzas WHERE id = @id";
-            using (SqlCommand cmd = new SqlCommand(query, conn))
-            {
-                cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                return await cmd.ExecuteNonQueryAsync();
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public async Task<int> OnCategoryDelete(int id)
-        {
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
 
-            var query = $"UPDATE Pizzas SET CategoryId = NULL WHERE CategoryId = @id";
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.Add(new SqlParameter("@id", id));
-                return await cmd.ExecuteNonQueryAsync();
+                using (SqlTransaction transaction = (SqlTransaction)(await conn.BeginTransactionAsync()))
+                {
+                    try
+                    {
+                        cmd.Transaction = transaction;
+
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                        await transaction.CommitAsync();
+
+                        return rowsAffected;
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
             }
         }
-        private async Task<int> ClearPizzaIngredients(int PizzaId)
-        {
-            using var conn = new SqlConnection(CONNECTION_STRING);
-            await conn.OpenAsync();
 
+        private async Task RemoveDishMenus(int DishId, SqlConnection conn)
+        {
             var query = $"DELETE FROM PizzaIngredient WHERE PizzaId = @id";
+
             using (SqlCommand cmd = new SqlCommand(query, conn))
             {
-                cmd.Parameters.Add(new SqlParameter("@id", PizzaId));
-                return await cmd.ExecuteNonQueryAsync();
+                cmd.Parameters.Add(new SqlParameter("@id", DishId));
+                await cmd.ExecuteNonQueryAsync();
             }
         }
-        private async Task<int> AddPizzaIngredients(int PizzaId, List<int> Ingredients)
-        {
-            using var conn = new SqlConnection(CONNECTION_STRING);
-            await conn.OpenAsync();
 
-            int inserted = 0;
+        private async Task AddDishMenus(int DishId, List<int> Ingredients, SqlConnection conn)
+        {
+            var insertIngredientQuery = $"INSERT INTO PizzaIngredient (PizzaId, IngredientId) VALUES (@PizzaId, @IngredientId)";
+
             foreach (int IngredientId in Ingredients)
             {
-                var insertIngredientQuery = $"INSERT INTO PizzaIngredient (PizzaId, IngredientId) VALUES (@PizzaId, @IngredientId)";
                 using (SqlCommand cmd = new SqlCommand(insertIngredientQuery, conn))
                 {
                     cmd.Parameters.Add(new SqlParameter("@PizzaId", PizzaId));
                     cmd.Parameters.Add(new SqlParameter("@IngredientId", IngredientId));
-                    inserted += await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
-            return inserted;
         }
-
-        /*
-        private async Task HandleIngredients(List<int> Ingredients, int PizzaId)
-        {
-            if (Ingredients == null)
-                return;
-
-            await ClearPizzaIngredients(PizzaId);
-
-            await AddPizzaIngredients(PizzaId, Ingredients);
-        }
-        */
 
         private void GetPizzaFromData(SqlDataReader reader, Dictionary<int, Pizza> pizzas)
         {
@@ -285,5 +267,20 @@ namespace ristorante_backend.Repositories
                 pizza.Ingredients.Add(i);
             }
         }
+
+        /*
+        public async Task<int> OnCategoryDelete(int id)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            var query = $"UPDATE Pizzas SET CategoryId = NULL WHERE CategoryId = @id";
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                cmd.Parameters.Add(new SqlParameter("@id", id));
+                return await cmd.ExecuteNonQueryAsync();
+            }
+        }
+        */
     }
 }
