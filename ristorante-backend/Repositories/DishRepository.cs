@@ -67,8 +67,7 @@ namespace ristorante_backend.Repositories
 
         public async Task<Dish> GetDishById(int id)
         {
-            string query = @"SELECT p.*, c.Id AS CategoryId, c.Name AS CategoryName,
-                           i.Id AS IngredientId, i.Name AS IngredientName
+            string query = @"SELECT p.*, c.Id AS CategoryId, c.Name AS CategoryName, i.Id AS IngredientId, i.Name AS IngredientName
                            FROM Pizzas p
                            LEFT JOIN Categories c ON p.CategoryId = c.Id
                            LEFT JOIN PizzaIngredient pi ON p.Id = pi.PizzaId
@@ -98,7 +97,7 @@ namespace ristorante_backend.Repositories
 
         public async Task<int> InsertDish(Dish Dish)
         {
-            string query = $"INSERT INTO Pizzas (Name, Description, Price, CategoryId) VALUES (@name, @description, @price, @categoryId)" +
+            string query = $"INSERT INTO Dishes (Name, Description, Price, CategoryId) VALUES (@name, @description, @price, @categoryId)" +
                            $"SELECT SCOPE_IDENTITY();";
 
             using SqlConnection conn = new SqlConnection(CONNECTION_STRING);
@@ -121,7 +120,7 @@ namespace ristorante_backend.Repositories
 
                         if (Dish.MenuIds.Any() || Dish.MenuIds != null)
                         {
-                            await AddDishMenus(dishId, Dish.MenuIds, conn);
+                            await AddDishMenus(dishId, Dish.MenuIds, cmd);
                         }
 
                         await transaction.CommitAsync();
@@ -139,9 +138,9 @@ namespace ristorante_backend.Repositories
 
         public async Task<int> UpdateDish(int pizzaId, Dish Dish)
         {
-            var query = $"UPDATE Pizzas SET Name = @name, Description = @description, Price = @price, CategoryId = @categoryId WHERE id = @id";
+            string query = $"UPDATE Dishes SET Name = @name, Description = @description, Price = @price, CategoryId = @categoryId WHERE id = @id";
 
-            using var conn = new SqlConnection(CONNECTION_STRING);
+            using SqlConnection conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
 
             using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -162,8 +161,8 @@ namespace ristorante_backend.Repositories
 
                         if (Dish.MenuIds.Any() || Dish.MenuIds != null)
                         {
-                            await RemoveDishMenus(pizzaId, conn);
-                            await AddDishMenus(pizzaId, Dish.MenuIds, conn);
+                            await RemoveDishMenus(pizzaId, cmd);
+                            await AddDishMenus(pizzaId, Dish.MenuIds, cmd);
                         }
 
                         await transaction.CommitAsync();
@@ -181,7 +180,7 @@ namespace ristorante_backend.Repositories
 
         public async Task<int> DeleteDish(int id)
         {
-            var query = $"DELETE FROM Pizzas WHERE id = @id";
+            string query = $"DELETE FROM Dishes WHERE id = @id";
 
             using var conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
@@ -211,60 +210,63 @@ namespace ristorante_backend.Repositories
             }
         }
 
-        private async Task RemoveDishMenus(int DishId, SqlConnection conn)
+        private async Task RemoveDishMenus(int dishId, SqlCommand cmd)
         {
-            var query = $"DELETE FROM PizzaIngredient WHERE PizzaId = @id";
+            cmd.CommandText = $"DELETE FROM Menus_Dishes WHERE dish_id = @id";
 
-            using (SqlCommand cmd = new SqlCommand(query, conn))
+            cmd.Parameters.Clear();
+            cmd.Parameters.Add(new SqlParameter("@id", dishId));
+
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        private async Task AddDishMenus(int dishId, List<int> MenuIds, SqlCommand cmd)
+        {
+            cmd.CommandText = $"INSERT INTO Menus_Dishes (menu_id, dish_id) VALUES (@MenuId, @DishId)";
+
+            foreach (int menuId in MenuIds)
             {
-                cmd.Parameters.Add(new SqlParameter("@id", DishId));
+                cmd.Parameters.Clear();
+                cmd.Parameters.Add(new SqlParameter("@MenuId", menuId));
+                cmd.Parameters.Add(new SqlParameter("@DishId", dishId));
+
                 await cmd.ExecuteNonQueryAsync();
             }
         }
 
-        private async Task AddDishMenus(int DishId, List<int> Ingredients, SqlConnection conn)
+        private void GetDishFromData(SqlDataReader reader, Dictionary<int, Dish> Dishes)
         {
-            var insertIngredientQuery = $"INSERT INTO PizzaIngredient (PizzaId, IngredientId) VALUES (@PizzaId, @IngredientId)";
+            int id = reader.GetInt32(reader.GetOrdinal("id"));
 
-            foreach (int IngredientId in Ingredients)
+            if (!Dishes.TryGetValue(id, out Dish dish))
             {
-                using (SqlCommand cmd = new SqlCommand(insertIngredientQuery, conn))
+                dish = new Dish();
+                dish.Id = id;
+                dish.Name = reader.GetString(reader.GetOrdinal("Name"));
+                dish.Description = reader.GetString(reader.GetOrdinal("Description"));
+                dish.Price = reader.GetDecimal(reader.GetOrdinal("Price"));
+
+                if (!reader.IsDBNull(reader.GetOrdinal("CategoryId")))
                 {
-                    cmd.Parameters.Add(new SqlParameter("@PizzaId", PizzaId));
-                    cmd.Parameters.Add(new SqlParameter("@IngredientId", IngredientId));
-                    await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
+                    Category category = new Category();
+                    category.Id = reader.GetInt32(reader.GetOrdinal("CategoryId"));
+                    category.Name = reader.GetString(reader.GetOrdinal("CategoryName"));
 
-        private void GetPizzaFromData(SqlDataReader reader, Dictionary<int, Pizza> pizzas)
-        {
-            var id = reader.GetInt32(reader.GetOrdinal("id"));
-            if (pizzas.TryGetValue(id, out Pizza pizza) == false)
-            {
-                var name = reader.GetString(reader.GetOrdinal("Name"));
-                var description = reader.GetString(reader.GetOrdinal("Description"));
-                var price = reader.GetDecimal(reader.GetOrdinal("Price"));
-                pizza = new Pizza(id, name, description, price);
-                pizzas.Add(id, pizza);
+                    dish.CategoryId = category.Id;
+                    dish.Category = category;
+                }
+
+                Dishes.Add(id, dish);
             }
-            if (reader.IsDBNull(reader.GetOrdinal("CategoryId")) == false)
+
+            if (!reader.IsDBNull(reader.GetOrdinal("MenuId")))
             {
-                var categoryId = reader.GetInt32(reader.GetOrdinal("CategoryId"));
-                var categoryName = reader.GetString(reader.GetOrdinal("CategoryName"));
-                Category c = new Category();
-                c.Id = categoryId;
-                c.Name = categoryName;
-                pizza.Category = c;
-                pizza.CategoryId = categoryId;
-            }
-            if (reader.IsDBNull(reader.GetOrdinal("IngredientId")) == false)
-            {
-                var ingredientId = reader.GetInt32(reader.GetOrdinal("IngredientId"));
-                var ingredientName = reader.GetString(reader.GetOrdinal("IngredientName"));
-                Ingredient i = new Ingredient(ingredientId, ingredientName);
-                pizza.IngredientIds.Add(ingredientId);
-                pizza.Ingredients.Add(i);
+                Menu menu = new Menu();
+                menu.Id = reader.GetInt32(reader.GetOrdinal("IngredientId"));
+                menu.Name = reader.GetString(reader.GetOrdinal("IngredientName"));
+
+                dish.MenuIds.Add(menu.Id);
+                dish.Menus.Add(menu);
             }
         }
 
