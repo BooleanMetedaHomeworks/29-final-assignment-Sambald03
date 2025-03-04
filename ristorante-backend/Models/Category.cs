@@ -7,17 +7,5 @@
 
 
         public Category() { }
-
-        /*
-        public Category(string name)
-        {
-            this.Name = name;
-        }
-
-        public Category(int id, string name) : this (name)
-        {
-            this.Id = id;
-        }
-        */
     }
 }

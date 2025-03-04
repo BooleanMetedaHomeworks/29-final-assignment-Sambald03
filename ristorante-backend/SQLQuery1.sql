@@ -1,4 +1,6 @@
-﻿CREATE TABLE Categories (
+﻿-- Creo le tabelle
+
+CREATE TABLE Categories (
     [id] INT NOT NULL identity(1,1) PRIMARY KEY,
     [name] VARCHAR(100) NOT NULL
 );
@@ -28,6 +30,9 @@ CREATE TABLE Menus_Dishes (
     FOREIGN KEY (menu_id) REFERENCES Menus(id) ON DELETE CASCADE,
     FOREIGN KEY (dish_id) REFERENCES Dishes(id) ON DELETE CASCADE
 );
+
+
+-- Insert per popolare il DB
 
 INSERT INTO Categories ([name]) VALUES ('Primo Piatto');
 INSERT INTO Categories ([name]) VALUES ('Secondo Piatto');
