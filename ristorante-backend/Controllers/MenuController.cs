@@ -39,7 +39,7 @@ namespace ristorante_backend.Controllers
         {
             try
             {
-                Menu menu = await this._menuRepository.GetMenu(id);
+                Menu menu = await this._menuRepository.GetMenuById(id);
 
                 if (menu == null)
                 {
@@ -64,7 +64,7 @@ namespace ristorante_backend.Controllers
                     return BadRequest(ModelState.Values);
                 }
 
-                return Ok(await this._menuRepository.CreateMenu(newMenu));
+                return Ok(await this._menuRepository.InsertMenu(newMenu));
             }
             catch (Exception e)
             {

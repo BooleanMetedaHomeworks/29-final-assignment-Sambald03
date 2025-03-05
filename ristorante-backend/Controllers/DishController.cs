@@ -38,7 +38,7 @@ namespace ristorante_backend.Controllers
         {
             try
             {
-                Dish dish = await this._dishRepository.GetDish(id);
+                Dish dish = await this._dishRepository.GetDishById(id);
 
                 if (dish == null)
                 {
@@ -63,7 +63,7 @@ namespace ristorante_backend.Controllers
                     return BadRequest(ModelState.Values);
                 }
 
-                return Ok(await this._dishRepository.CreateDish(newDish));
+                return Ok(await this._dishRepository.InsertDish(newDish));
             }
             catch (Exception e)
             {

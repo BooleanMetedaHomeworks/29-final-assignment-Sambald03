@@ -38,7 +38,7 @@ namespace ristorante_backend.Controllers
         {
             try
             {
-                Category category = await this._categoryRepository.GetCategory(id);
+                Category category = await this._categoryRepository.GetCategoryById(id);
 
                 if (category == null)
                 {
@@ -63,7 +63,7 @@ namespace ristorante_backend.Controllers
                     return BadRequest(ModelState.Values);
                 }
 
-                return Ok(await this._categoryRepository.CreateCategory(newCategory));
+                return Ok(await this._categoryRepository.InsertCategory(newCategory));
             }
             catch (Exception e)
             {
