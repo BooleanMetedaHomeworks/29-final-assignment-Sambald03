@@ -20,6 +20,8 @@ namespace ristorante_frontend
         {
             InitializeComponent();
         }
+
+        /*
         private void OnLoginBtnClick(object sender, RoutedEventArgs e)
         {
             this.MainFrame.NavigationService.Navigate(new Uri("Views/Pages/LoginPage.xaml", UriKind.Relative));
@@ -29,6 +31,6 @@ namespace ristorante_frontend
         {
             this.MainFrame.NavigationService.Navigate(new Uri("Views/Pages/UserPage.xaml", UriKind.Relative));
         }
-
+        */
     }
 }

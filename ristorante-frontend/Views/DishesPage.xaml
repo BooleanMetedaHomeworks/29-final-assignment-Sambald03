@@ -1,0 +1,85 @@
+﻿<Page x:Class="ristorante_frontend.Views.Pages.DishesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ristorante_frontend.Views.Pages"
+      xmlns:viewmodels="clr-namespace:ristorante_frontend.ViewModels"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="DishesPage">
+
+    <Page.DataContext>
+        <viewmodels:DishesViewModel></viewmodels:DishesViewModel>
+    </Page.DataContext>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!--
+    <Label Grid.Row="0" Grid.Column="1" Content="Titolo" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    <Label Grid.Row="0" Grid.Column="2" Content="Contenuto" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    <Label Grid.Row="0" Grid.Column="3" Content="Prima Pagina" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    <Label Grid.Row="0" Grid.Column="4" Content="Categoria" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    <Label Grid.Row="0" Grid.Column="5" Content="Salva" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    <Label Grid.Row="0" Grid.Column="6" Content="Rimuovi" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+    -->
+        <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Hidden">
+            <!-- Grid.ColumnSpan="7" Grid.Row="1" Grid.Column="0" -->
+            <StackPanel>
+                <ListBox ItemsSource="{Binding Dishes}" HorizontalContentAlignment="Stretch" RenderTransformOrigin="0.568,0.564">
+                    <!-- SelectionChanged="ListBox_SelectionChanged" -->
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <!-- <ColumnDefinition Width="*" /> -->
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" Margin="" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                                <TextBox Grid.Column="1" Text="{Binding Description}" Margin="0" VerticalContentAlignment="Center"/>
+                                <TextBox Grid.Column="2" Text="{Binding Price}" VerticalAlignment="Center" HorizontalContentAlignment="Center"/>
+                                <!--
+                            <ComboBox Grid.Column="3" x:Name="comboBoxCategoria" IsEditable="True" 
+                              ItemsSource="{Binding DataContext.Categorie, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" 
+                              SelectedItem="{Binding Categoria, Mode=TwoWay}"
+                              VerticalAlignment="Center"
+                              Margin="0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Titolo}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                                <ComboBox.DisplayMemberPath>Titolo</ComboBox.DisplayMemberPath>
+                            </ComboBox>
+                            -->
+                                <Button Grid.Column="3" Command="{Binding DataContext.SaveDishCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" CommandParameter="{Binding}" Margin="5" Content="Salva"/>
+                                <!-- Visibility="..." -->
+                                <!-- Visibility="e qui?, Converter={StaticResource B2VConverter}}" -->
+                                <Button Grid.Column="4" Command="{Binding DataContext.DeleteDishCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" CommandParameter="{Binding}" Margin="10,5,0,5" Content="Rimuovi"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Canvas Height="100"/>
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Command="{Binding AddDishCommand}">Crea articolo</Button>
+            <Button Click="OnBackBtn">INDIETRO</Button>
+        </StackPanel>
+    </Grid>
+</Page>

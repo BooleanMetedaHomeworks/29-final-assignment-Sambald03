@@ -9,6 +9,7 @@ using ristorante_frontend.ViewModels.Commands;
 using System.Windows.Input;
 using System.Windows;
 using ristorante_frontend.Models;
+using ristorante_frontend.Services;
 
 namespace ristorante_frontend.ViewModels
 {
@@ -27,6 +28,7 @@ namespace ristorante_frontend.ViewModels
             }
         }
 
+        /*
         private ObservableCollection<Category> _categories;
         public ObservableCollection<Category> Categories
         {
@@ -39,6 +41,7 @@ namespace ristorante_frontend.ViewModels
                 OnPropertyChanged(nameof(Categories));
             }
         }
+        */
 
         public ICommand AddDishCommand { get; private set; }
         public ICommand SaveDishCommand { get; private set; }
@@ -57,7 +60,7 @@ namespace ristorante_frontend.ViewModels
                     Price = 0.0m
                 };
 
-                var createApiResult = await ApiService.CreateArticolo(newDish);
+                var createApiResult = await ApiService.CreateDish(newDish);
 
                 if (createApiResult.Data == null)
                 {
@@ -69,9 +72,9 @@ namespace ristorante_frontend.ViewModels
                 Dishes.Add(newDish);
             });
 
-            this.SaveArticoloCommand = new GenericCommand<Articolo>(async (post) =>
+            this.SaveDishCommand = new GenericCommand<Dish>(async (dish) =>
             {
-                var updateApiResult = await ApiService.UpdateArticolo(post);
+                var updateApiResult = await ApiService.UpdateDish(dish);
 
                 if (updateApiResult.Data == 0)
                 {
@@ -80,24 +83,24 @@ namespace ristorante_frontend.ViewModels
                 }
             });
 
-            this.DeleteArticoloCommand = new GenericCommand<Articolo>(async post =>
+            this.DeleteDishCommand = new GenericCommand<Dish>(async (dish) =>
             {
-                var deleteApiResult = await ApiService.DeleteArticolo(post.Id);
+                var deleteApiResult = await ApiService.DeleteDish(dish.Id);
 
                 if (deleteApiResult.Data == 0)
                 {
-                    MessageBox.Show($"ERRORE! {deleteApiResult.ErrorMessage} {ApiServiceResultType.Error}");
+                    MessageBox.Show($"ERRORE! {deleteApiResult.ErrorMessage}");
                     return;
                 }
 
-                Articoli.Remove(post);
+                Dishes.Remove(dish);
             });
         }
 
         public async Task Initialize()
         {
-            var dishApiResult = await ApiService.GetArticoli();
-            var categoryApiResult = await ApiService.GetCategorie();
+            var dishApiResult = await ApiService.GetDishes();
+            //var categoryApiResult = await ApiService.GetCategorie();
 
             if (dishApiResult.Data == null)
             {
@@ -107,6 +110,7 @@ namespace ristorante_frontend.ViewModels
 
             Dishes = new ObservableCollection<Dish>(dishApiResult.Data);
 
+            /*
             if (categoryApiResult.Data == null)
             {
                 MessageBox.Show($"ERRORE! {categoryApiResult.ErrorMessage}");
@@ -114,6 +118,7 @@ namespace ristorante_frontend.ViewModels
             }
 
             Categories = new ObservableCollection<Category>(categoryApiResult.Data);
+            */
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
