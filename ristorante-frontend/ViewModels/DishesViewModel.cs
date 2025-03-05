@@ -8,69 +8,56 @@ using System.Threading.Tasks;
 using ristorante_frontend.ViewModels.Commands;
 using System.Windows.Input;
 using System.Windows;
+using ristorante_frontend.Models;
 
 namespace ristorante_frontend.ViewModels
 {
     public class DishesViewModel : INotifyPropertyChanged
     {
-        private Categoria _categoria { get; set; }
-        public Categoria Categoria
+        private ObservableCollection<Dish> _dishes;
+        public ObservableCollection<Dish> Dishes
         {
-            get { return _categoria; }
+            get { return _dishes; }
             private set
             {
-                if (value == _categoria) { return; }
+                if (value == _dishes) { return; }
 
-                _categoria = value;
-                OnPropertyChanged(nameof(Categoria));
+                _dishes = value;
+                OnPropertyChanged(nameof(Dishes));
             }
         }
 
-
-        private ObservableCollection<Categoria> _categorie;
-        public ObservableCollection<Categoria> Categorie
+        private ObservableCollection<Category> _categories;
+        public ObservableCollection<Category> Categories
         {
-            get { return _categorie; }
+            get { return _categories; }
             private set
             {
-                if (value == _categorie) { return; }
+                if (value == _categories) { return; }
 
-                _categorie = value;
-                OnPropertyChanged(nameof(Categorie));
+                _categories = value;
+                OnPropertyChanged(nameof(Categories));
             }
         }
 
-        private ObservableCollection<Articolo> _articoli;
-        public ObservableCollection<Articolo> Articoli
-        {
-            get { return _articoli; }
-            private set
-            {
-                if (value == _articoli) { return; }
+        public ICommand AddDishCommand { get; private set; }
+        public ICommand SaveDishCommand { get; private set; }
+        public ICommand DeleteDishCommand { get; private set; }
 
-                _articoli = value;
-                OnPropertyChanged(nameof(Articoli));
-            }
-        }
-
-        public ICommand AddArticoloCommand { get; private set; }
-        public ICommand SaveArticoloCommand { get; private set; }
-        public ICommand DeleteArticoloCommand { get; private set; }
-
-        public ArticoloViewModel()
+        public DishesViewModel()
         {
             _ = Initialize();
 
-            this.AddArticoloCommand = new MyCommand(async () =>
+            this.AddDishCommand = new MyCommand(async () =>
             {
-                Articolo newArticolo = new Articolo()
+                Dish newDish = new Dish()
                 {
-                    Titolo = "Nuovo Articolo",
-                    Contenuto = "Nuova Descrizione",
-                    isPrimaPagina = false
+                    Name = "Nuovo Piatto",
+                    Description = "Nuova Descrizione",
+                    Price = 0.0m
                 };
 
-                var createApiResult = await ApiService.CreateArticolo(newArticolo);
+                var createApiResult = await ApiService.CreateArticolo(newDish);
 
                 if (createApiResult.Data == null)
                 {
@@ -78,8 +65,8 @@ namespace ristorante_frontend.ViewModels
                     return;
                 }
 
-                newArticolo.Id = createApiResult.Data;
-                Articoli.Add(newArticolo);
+                newDish.Id = createApiResult.Data;
+                Dishes.Add(newDish);
             });
 
             this.SaveArticoloCommand = new GenericCommand<Articolo>(async (post) =>
@@ -109,23 +96,24 @@ namespace ristorante_frontend.ViewModels
 
         public async Task Initialize()
         {
-            var postsApiResult = await ApiService.GetArticoli();
-            var categoriaApiResult = await ApiService.GetCategorie();
+            var dishApiResult = await ApiService.GetArticoli();
+            var categoryApiResult = await ApiService.GetCategorie();
 
-            if (postsApiResult.Data == null)
+            if (dishApiResult.Data == null)
             {
-                MessageBox.Show($"ERRORE! {postsApiResult.ErrorMessage}");
+                MessageBox.Show($"ERRORE! {dishApiResult.ErrorMessage}");
                 return;
             }
 
-            Articoli = new ObservableCollection<Articolo>(postsApiResult.Data);
+            Dishes = new ObservableCollection<Dish>(dishApiResult.Data);
 
-            if (categoriaApiResult.Data == null)
+            if (categoryApiResult.Data == null)
             {
-                MessageBox.Show($"ERRORE! {postsApiResult.ErrorMessage}");
+                MessageBox.Show($"ERRORE! {categoryApiResult.ErrorMessage}");
                 return;
             }
-            Categorie = new ObservableCollection<Categoria>(categoriaApiResult.Data);
+
+            Categories = new ObservableCollection<Category>(categoryApiResult.Data);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
