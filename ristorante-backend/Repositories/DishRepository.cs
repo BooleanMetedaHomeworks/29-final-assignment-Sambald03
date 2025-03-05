@@ -89,7 +89,7 @@ namespace ristorante_backend.Repositories
 
         public async Task<int> InsertDish(Dish Dish)
         {
-            string query = @"INSERT INTO Dishes (Name, Description, Price, CategoryId)
+            string query = @"INSERT INTO Dishes (Name, Description, Price, Category_id)
                              VALUES (@name, @description, @price, @categoryId)
                              SELECT SCOPE_IDENTITY();";
 
@@ -126,7 +126,7 @@ namespace ristorante_backend.Repositories
 
         public async Task<int> UpdateDish(int pizzaId, Dish Dish)
         {
-            string query = @"UPDATE Dishes SET Name = @name, Description = @description, Price = @price, CategoryId = @categoryId
+            string query = @"UPDATE Dishes SET Name = @name, Description = @description, Price = @price, Category_id = @categoryId
                              WHERE id=@id;";
 
             using SqlConnection conn = new SqlConnection(CONNECTION_STRING);

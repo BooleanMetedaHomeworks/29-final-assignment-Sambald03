@@ -1,4 +1,6 @@
 
+using ristorante_backend.Repositories;
+
 namespace ristorante_backend
 {
     public class Program
@@ -13,6 +15,10 @@ namespace ristorante_backend
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSingleton<DishRepository>();
+            builder.Services.AddSingleton<MenuRepository>();
+            builder.Services.AddSingleton<CategoryRepository>();
 
             var app = builder.Build();
 

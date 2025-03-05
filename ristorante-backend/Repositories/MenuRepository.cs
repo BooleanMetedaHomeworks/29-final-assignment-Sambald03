@@ -70,7 +70,7 @@ namespace ristorante_backend.Repositories
                              LEFT JOIN Menus_Dishes md ON m.Id = md.menu_id
                              LEFT JOIN Dishes d ON md.dish_id = d.Id
                              LEFT JOIN Categories c ON d.category_id = c.id
-                             WHERE p.id=@id;";
+                             WHERE m.id=@id;";
 
             using SqlConnection conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();

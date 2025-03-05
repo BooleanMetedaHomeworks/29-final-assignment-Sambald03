@@ -61,7 +61,7 @@ namespace ristorante_backend.Repositories
         {
             string query = @"SELECT *
                              FROM Categories
-                             WHERE p.id=@id;";
+                             WHERE id=@id;";
 
             using SqlConnection conn = new SqlConnection(CONNECTION_STRING);
             await conn.OpenAsync();
