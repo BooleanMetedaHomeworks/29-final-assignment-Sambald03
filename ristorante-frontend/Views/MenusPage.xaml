@@ -52,15 +52,21 @@
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="3*" />
                                                     <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
                                                 <Label Grid.Column="0" Content="{Binding Name}" FontWeight="Bold" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />
                                                 <Label Grid.Column="1" Content="{Binding Description}" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
                                                 <Label Grid.Column="2" Content="{Binding Price}" ContentStringFormat=" {0:N2} €" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+                                                <Button Grid.Column="3" Command="{Binding DataContext.RemoveDishIntoMenuCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" CommandParameter="{Binding}" Margin="5" Content="Inserisci nel Menù">
+                                                    <Button.Tag>
+                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" />
+                                                    </Button.Tag>
+                                                </Button>
                                             </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
-                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Command="{Binding AddDishCommand}">Aggiungi piatto</Button>
+                                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Command="{Binding DataContext.OpenDishesListWindowCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" CommandParameter="{Binding}">Aggiungi piatto</Button>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

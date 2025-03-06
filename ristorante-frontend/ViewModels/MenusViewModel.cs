@@ -10,13 +10,15 @@ using ristorante_frontend.ViewModels.Commands;
 using System.Windows.Input;
 using System.Windows;
 using ristorante_frontend.Models;
+using ristorante_frontend.Views;
+using System.Windows.Controls;
 
 namespace ristorante_frontend.ViewModels
 {
     public class MenusViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<Menu> _menus;
-        public ObservableCollection<Menu> Menus
+        private ObservableCollection<Models.Menu> _menus;
+        public ObservableCollection<Models.Menu> Menus
         {
             get { return _menus; }
             private set
@@ -31,6 +33,8 @@ namespace ristorante_frontend.ViewModels
         public ICommand AddMenuCommand { get; private set; }
         public ICommand SaveMenuCommand { get; private set; }
         public ICommand DeleteMenuCommand { get; private set; }
+        public ICommand RemoveDishIntoMenuCommand { get; private set; }
+        public ICommand OpenDishesListWindowCommand { get; private set; }
 
         public MenusViewModel()
         {
@@ -38,7 +42,7 @@ namespace ristorante_frontend.ViewModels
 
             this.AddMenuCommand = new MyCommand(async () =>
             {
-                Menu newMenu = new Menu()
+                Models.Menu newMenu = new Models.Menu()
                 {
                     Name = "Nuovo Menu"
                 };
@@ -55,7 +59,7 @@ namespace ristorante_frontend.ViewModels
                 Menus.Add(newMenu);
             });
 
-            this.SaveMenuCommand = new GenericCommand<Menu>(async (menu) =>
+            this.SaveMenuCommand = new GenericCommand<Models.Menu>(async (menu) =>
             {
                 var updateApiResult = await ApiService.UpdateMenu(menu);
 
@@ -66,7 +70,7 @@ namespace ristorante_frontend.ViewModels
                 }
             });
 
-            this.DeleteMenuCommand = new GenericCommand<Menu>(async (menu) =>
+            this.DeleteMenuCommand = new GenericCommand<Models.Menu>(async (menu) =>
             {
                 var deleteApiResult = await ApiService.DeleteMenu(menu.Id);
 
@@ -77,6 +81,29 @@ namespace ristorante_frontend.ViewModels
                 }
 
                 Menus.Remove(menu);
+            });
+
+            this.RemoveDishIntoMenuCommand = new GenericCommand<Dish>(async (dish) =>
+            {
+                var button = Mouse.DirectlyOver as Button;
+                if (button?.Tag is Models.Menu menu)
+                {
+                    var updateApiResult = await ApiService.DeleteDishIntoMenu(menu.Id, dish.Id);
+
+                    if (updateApiResult.Data == 0)
+                    {
+                        MessageBox.Show($"ERRORE! {updateApiResult.ErrorMessage}");
+                        return;
+                    }
+                }
+            });
+
+            this.OpenDishesListWindowCommand = new GenericCommand<Models.Menu>((menu) =>
+            {
+                var viewModel = new DishesListViewModel(menu.Id);
+                var window = new DishesWindow(viewModel);
+
+                window.ShowDialog();
             });
         }
 
@@ -91,7 +118,7 @@ namespace ristorante_frontend.ViewModels
                 return;
             }
 
-            Menus = new ObservableCollection<Menu>(menuApiResult.Data);
+            Menus = new ObservableCollection<Models.Menu>(menuApiResult.Data);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

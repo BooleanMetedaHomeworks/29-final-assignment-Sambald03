@@ -150,6 +150,38 @@ namespace ristorante_frontend.Services
             }
         }
 
+        public static async Task<ApiServiceResult<int>> CreateDishIntoMenu(int idMenu, Dish dish)
+        {
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                var httpResult = await httpClient.PostAsync($"{API_URL}/Dish/{idMenu}", JsonContent.Create(dish));
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<int>(resultBody);
+                return new ApiServiceResult<int>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<int>(e);
+            }
+        }
+
+        public static async Task<ApiServiceResult<int>> DeleteDishIntoMenu(int idMenu, int idDish)
+        {
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                var httpResult = await httpClient.DeleteAsync($"{API_URL}/Dish/{idMenu}/{idDish}");
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<int>(resultBody);
+                return new ApiServiceResult<int>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<int>(e);
+            }
+        }
+
         /*
         public static async Task<ApiServiceResult<List<Categoria>>> GetCategorie()
         {
