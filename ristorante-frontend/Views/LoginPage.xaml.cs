@@ -27,12 +27,12 @@ namespace ristorante_frontend.Views
 
         private async void OnLoginBtnClick(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("Views/DishesPage.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new Uri("Views/MenusPage.xaml", UriKind.Relative));
         }
 
         private async void OnRegisterBtnClick(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("Views/DishesPage.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new Uri("Views/MenusPage.xaml", UriKind.Relative));
         }
     }
 }

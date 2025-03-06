@@ -86,6 +86,70 @@ namespace ristorante_frontend.Services
             }
         }
 
+        public static async Task<ApiServiceResult<List<Menu>>> GetMenus()
+        {
+            try
+            {
+                using HttpClient client = new HttpClient();
+                var httpResult = await client.GetAsync($"{API_URL}/Menu");
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<List<Menu>>(resultBody);
+                return new ApiServiceResult<List<Menu>>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<List<Menu>>(e);
+            }
+        }
+
+        public static async Task<ApiServiceResult<int>> CreateMenu(Menu menu)
+        {
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                var httpResult = await httpClient.PostAsync($"{API_URL}/Menu", JsonContent.Create(menu));
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<int>(resultBody);
+                return new ApiServiceResult<int>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<int>(e);
+            }
+        }
+
+        public static async Task<ApiServiceResult<int>> UpdateMenu(Menu menu)
+        {
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                var httpResult = await httpClient.PutAsync($"{API_URL}/Menu/{menu.Id}", JsonContent.Create(menu));
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<int>(resultBody);
+                return new ApiServiceResult<int>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<int>(e);
+            }
+        }
+
+        public static async Task<ApiServiceResult<int>> DeleteMenu(int id)
+        {
+            try
+            {
+                using HttpClient httpClient = new HttpClient();
+                var httpResult = await httpClient.DeleteAsync($"{API_URL}/Menu/{id}");
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<int>(resultBody);
+                return new ApiServiceResult<int>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<int>(e);
+            }
+        }
+
         /*
         public static async Task<ApiServiceResult<List<Categoria>>> GetCategorie()
         {

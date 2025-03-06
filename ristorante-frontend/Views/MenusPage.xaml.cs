@@ -24,5 +24,15 @@ namespace ristorante_frontend.Views.Pages
         {
             InitializeComponent();
         }
+
+        private void OnBackBtn(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("Views/LoginPage.xaml", UriKind.Relative));
+        }
+
+        private void OnShowListDishesBtn(object sender, SelectionChangedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Uri("Views/DishesPage.xaml", UriKind.Relative));
+        }
     }
 }
