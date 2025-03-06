@@ -30,7 +30,7 @@ namespace ristorante_frontend.Views.Pages
             this.NavigationService.Navigate(new Uri("Views/LoginPage.xaml", UriKind.Relative));
         }
 
-        private void OnShowListDishesBtn(object sender, SelectionChangedEventArgs e)
+        private void OnShowListDishesBtn(object sender, RoutedEventArgs e)
         {
             this.NavigationService.Navigate(new Uri("Views/DishesPage.xaml", UriKind.Relative));
         }

@@ -27,7 +27,7 @@ namespace ristorante_frontend.Views.Pages
 
         private void OnBackBtn(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("Views/LoginPage.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new Uri("Views/MenusPage.xaml", UriKind.Relative));
         }
     }
 }

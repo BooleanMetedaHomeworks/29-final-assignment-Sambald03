@@ -10,8 +10,8 @@
 
     <Grid VerticalAlignment="Center">
         <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
-            <RowDefinition Height="70"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="auto"/>
@@ -21,7 +21,7 @@
             <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold">BENVENUTI AL RISTORANTE!!</Label>
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="20">BENVENUTI AL RISTORANTE!!</Label>
         <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold">Per favore inserire mail e password</Label>
         <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">
             <Grid.RowDefinitions>

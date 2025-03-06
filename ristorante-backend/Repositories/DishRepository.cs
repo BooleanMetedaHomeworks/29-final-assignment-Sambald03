@@ -8,6 +8,14 @@ namespace ristorante_backend.Repositories
 {
     public class DishRepository
     {
+        private MenuRepository _menuRepository { get; set; }
+
+        public DishRepository(MenuRepository menuRepository)
+        {
+            this._menuRepository = menuRepository;
+        }
+
+
         public async Task<List<Dish>> GetAllDishes()
         {
             string query = @"SELECT d.*, c.Id AS CategoryId, c.Name AS CategoryName
@@ -213,6 +221,64 @@ namespace ristorante_backend.Repositories
             }
 
             return dish;
+        }
+
+        public async Task<int> InsertDishIntoMenu(int idMenu, int idDish)
+        {
+            using SqlConnection conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                using (SqlTransaction transaction = (SqlTransaction)(await conn.BeginTransactionAsync()))
+                {
+                    try
+                    {
+                        cmd.Transaction = transaction;
+                        cmd.Connection = conn;
+
+                        int affectedRows = await _menuRepository.AddMenuDishes(idMenu, new List<int>() { idDish }, cmd);
+
+                        await transaction.CommitAsync();
+
+                        return affectedRows;
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task<int> DeleteDishIntoMenu(int idMenu, int idDish)
+        {
+            using var conn = new SqlConnection(CONNECTION_STRING);
+            await conn.OpenAsync();
+
+            using (SqlCommand cmd = new SqlCommand())
+            {
+                using (SqlTransaction transaction = (SqlTransaction)(await conn.BeginTransactionAsync()))
+                {
+                    try
+                    {
+                        cmd.Transaction = transaction;
+                        cmd.Connection = conn;
+
+                        int affectedRows = await _menuRepository.RemoveMenuDishes(idMenu, cmd, idDish);
+
+                        await transaction.CommitAsync();
+
+                        return affectedRows;
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
+            }
         }
 
         /*

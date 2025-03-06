@@ -24,7 +24,7 @@
         <Label Grid.Row="0" Content="I NOSTRI MENÙ" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
         <ScrollViewer Grid.Row="1" Grid.Column="0">
             <StackPanel>
-                <ListBox ItemsSource="{Binding Menus}" HorizontalContentAlignment="Stretch" SelectionChanged="ListBox_SelectionChanged">
+                <ListBox ItemsSource="{Binding Menus}" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5">
@@ -69,9 +69,9 @@
             </StackPanel>
         </ScrollViewer>
         <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Click="OnShowListDishesBtn">Mostra Piatti Ristorante</Button>
-            <Button Command="{Binding AddMenuCommand}">Crea Menù</Button>
-            <Button Click="OnBackBtn">INDIETRO</Button>
+            <Button Click="OnBackBtn" Margin="3,0">Torna Indietro</Button>
+            <Button Command="{Binding AddMenuCommand}" Margin="3,0">Crea Menù</Button>
+            <Button Click="OnShowListDishesBtn" Margin="3,0">Mostra Lista Piatti</Button>
         </StackPanel>
     </Grid>
 </Page>

@@ -115,5 +115,45 @@ namespace ristorante_backend.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("{idMenu}/{idDish}")]
+        public async Task<IActionResult> AddDishIntoMenu(int idMenu, int idDish)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState.Values);
+                }
+
+                int affectedRows = await this._dishRepository.InsertDishIntoMenu(idMenu, idDish);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpDelete("{idMenu}/{idDish}")]
+        public async Task<IActionResult> DeleteDishIntoMenu(int idMenu, int idDish)
+        {
+            try
+            {
+                int affectedRows = await this._dishRepository.DeleteDishIntoMenu(idMenu, idDish);
+
+                if (affectedRows == 0)
+                {
+                    return NotFound();
+                }
+
+                return Ok(affectedRows);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

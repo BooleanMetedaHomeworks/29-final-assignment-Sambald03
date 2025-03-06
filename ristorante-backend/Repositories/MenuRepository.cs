@@ -205,21 +205,35 @@ namespace ristorante_backend.Repositories
             }
         }
 
-        private async Task RemoveMenuDishes(int menuId, SqlCommand cmd)
+        public async Task<int> RemoveMenuDishes(int menuId, SqlCommand cmd, int idDish = 0)
         {
-            cmd.CommandText = @"DELETE FROM Menus_Dishes
-                                WHERE menu_id = @id;";
-
             cmd.Parameters.Clear();
-            cmd.Parameters.Add(new SqlParameter("@id", menuId));
 
-            await cmd.ExecuteNonQueryAsync();
+            if (idDish == 0)
+            {
+                cmd.CommandText = @"DELETE FROM Menus_Dishes
+                                    WHERE menu_id = @idMenu;";
+            }
+            else
+            {
+                cmd.CommandText = @"DELETE FROM Menus_Dishes
+                                    WHERE menu_id = @idmenu
+                                    AND dish_id = @idDish;";
+
+                cmd.Parameters.Add(new SqlParameter("@idDish", idDish));
+            }
+            
+            cmd.Parameters.Add(new SqlParameter("@idMenu", menuId));
+
+            return await cmd.ExecuteNonQueryAsync();
         }
 
-        private async Task AddMenuDishes(int menuId, List<int> dishIds, SqlCommand cmd)
+        public async Task<int> AddMenuDishes(int menuId, List<int> dishIds, SqlCommand cmd)
         {
             cmd.CommandText = @"INSERT INTO Menus_Dishes (menu_id, dish_id)
                                 VALUES (@MenuId, @DishId);";
+
+            int rowsaffected = 0;
 
             foreach (int dishId in dishIds)
             {
@@ -227,8 +241,10 @@ namespace ristorante_backend.Repositories
                 cmd.Parameters.Add(new SqlParameter("@MenuId", menuId));
                 cmd.Parameters.Add(new SqlParameter("@DishId", dishId));
 
-                await cmd.ExecuteNonQueryAsync();
+                rowsaffected += await cmd.ExecuteNonQueryAsync();
             }
+
+            return rowsaffected;
         }
 
         private void GetMenuFromData(SqlDataReader reader, Dictionary<int, Menu> menus)
