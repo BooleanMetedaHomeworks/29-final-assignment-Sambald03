@@ -79,31 +79,6 @@ namespace ristorante_frontend.ViewModels
             }
 
             Dishes = new ObservableCollection<Dish>(dishApiResult.Data);
-
-            /*
-            Dishes = new ObservableCollection<Dish>()
-            {
-                new Dish()
-                {
-                    Name = "Piatto da scegliere 1",
-                    Description = "Descrizione 1",
-                    Price = 1
-                },
-                new Dish()
-                {
-                    Name = "Piatto da scegliere 2",
-                    Description = "Descrizione 2",
-                    Price = 2
-                },
-                new Dish()
-                {
-                    Name = "Piatto da scegliere 3",
-                    Description = "Descrizione 3",
-                    Price = 3
-                }
-            };
-            */
-
         }
 
         private void CloseWindow()

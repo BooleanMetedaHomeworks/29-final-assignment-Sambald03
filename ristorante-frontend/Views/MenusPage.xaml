@@ -5,10 +5,14 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:ristorante_frontend.Views.Pages"
       xmlns:viewmodels="clr-namespace:ristorante_frontend.ViewModels"
+      xmlns:mdi="clr-namespace:ristorante_frontend.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MenusPage">
 
+    <Page.Resources>
+        <mdi:MenuDishIdConverter x:Key="MenuDishIdConverter" />
+    </Page.Resources>
     <Page.DataContext>
         <viewmodels:MenusViewModel></viewmodels:MenusViewModel>
     </Page.DataContext>
@@ -24,7 +28,7 @@
         <Label Grid.Row="0" Content="I NOSTRI MENÙ" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
         <ScrollViewer Grid.Row="1" Grid.Column="0">
             <StackPanel>
-                <ListBox ItemsSource="{Binding Menus}" HorizontalContentAlignment="Stretch">
+                <ListBox ItemsSource="{Binding Menus}" SelectedItem="{Binding SelectedMenu, Mode=TwoWay}" HorizontalContentAlignment="Stretch">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5">
@@ -57,10 +61,13 @@
                                                 <Label Grid.Column="0" Content="{Binding Name}" FontWeight="Bold" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />
                                                 <Label Grid.Column="1" Content="{Binding Description}" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
                                                 <Label Grid.Column="2" Content="{Binding Price}" ContentStringFormat=" {0:N2} €" Margin="10,0" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" />
-                                                <Button Grid.Column="3" Command="{Binding DataContext.RemoveDishIntoMenuCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" CommandParameter="{Binding}" Margin="5" Content="Inserisci nel Menù">
-                                                    <Button.Tag>
-                                                        <Binding Path="DataContext" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}}" />
-                                                    </Button.Tag>
+                                                <Button Grid.Column="3" Command="{Binding DataContext.RemoveDishIntoMenuCommand, RelativeSource={RelativeSource AncestorType={x:Type Page}}}" Margin="5" Content="Rimuovi dal Menù">
+                                                    <Button.CommandParameter>
+                                                        <MultiBinding Converter="{StaticResource MenuDishIdConverter}">
+                                                            <Binding Path="Id" />
+                                                            <Binding Path="DataContext.Id" RelativeSource="{RelativeSource AncestorType={x:Type ListBox}, AncestorLevel=1}" />
+                                                        </MultiBinding>
+                                                    </Button.CommandParameter>
                                                 </Button>
                                             </Grid>
                                         </DataTemplate>

@@ -38,6 +38,22 @@ namespace ristorante_frontend.Services
             }
         }
 
+        public static async Task<ApiServiceResult<Dish>> GetDishById(int id)
+        {
+            try
+            {
+                using HttpClient client = new HttpClient();
+                var httpResult = await client.GetAsync($"{API_URL}/Dish/{id}");
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<Dish>(resultBody);
+                return new ApiServiceResult<Dish>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<Dish>(e);
+            }
+        }
+
         public static async Task<ApiServiceResult<int>> CreateDish(Dish dish)
         {
             try

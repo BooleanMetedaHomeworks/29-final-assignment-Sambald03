@@ -128,7 +128,7 @@ namespace ristorante_backend.Controllers
 
                 int affectedRows = await this._dishRepository.InsertDishIntoMenu(idMenu, dish.Id);
 
-                return Ok();
+                return Ok(affectedRows);
             }
             catch (Exception e)
             {

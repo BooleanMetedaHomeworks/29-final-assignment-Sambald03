@@ -30,6 +30,20 @@ namespace ristorante_frontend.ViewModels
             }
         }
 
+        private Models.Menu _selectedMenu;
+        public Models.Menu SelectedMenu
+        {
+            get { return _selectedMenu; }
+            set
+            {
+                if (_selectedMenu != value)
+                {
+                    _selectedMenu = value;
+                    OnPropertyChanged(nameof(SelectedMenu));
+                }
+            }
+        }
+
         public ICommand AddMenuCommand { get; private set; }
         public ICommand SaveMenuCommand { get; private set; }
         public ICommand DeleteMenuCommand { get; private set; }
@@ -83,19 +97,36 @@ namespace ristorante_frontend.ViewModels
                 Menus.Remove(menu);
             });
 
+            /*
             this.RemoveDishIntoMenuCommand = new GenericCommand<Dish>(async (dish) =>
             {
-                var button = Mouse.DirectlyOver as Button;
-                if (button?.Tag is Models.Menu menu)
-                {
-                    var updateApiResult = await ApiService.DeleteDishIntoMenu(menu.Id, dish.Id);
+                var updateApiResult = await ApiService.DeleteDishIntoMenu(SelectedMenu.Id, dish.Id);
 
-                    if (updateApiResult.Data == 0)
-                    {
-                        MessageBox.Show($"ERRORE! {updateApiResult.ErrorMessage}");
-                        return;
-                    }
+                if (updateApiResult.Data == 0)
+                {
+                    MessageBox.Show($"ERRORE! {updateApiResult.ErrorMessage}");
+                    return;
                 }
+
+                _ = Initialize();
+            });
+            */
+
+            //NON FUNZIA -> NON CALCOLARE IL CONVERTER
+            this.RemoveDishIntoMenuCommand = new GenericCommand<Tuple<int,int>>(async (menuAndDishIds) =>
+            {
+                int idMenu = menuAndDishIds.Item1;
+                int idDish = menuAndDishIds.Item2;
+
+                var updateApiResult = await ApiService.DeleteDishIntoMenu(idMenu, idDish);
+
+                if (updateApiResult.Data == 0)
+                {
+                    MessageBox.Show($"ERRORE! {updateApiResult.ErrorMessage}");
+                    return;
+                }
+
+                _ = Initialize();
             });
 
             this.OpenDishesListWindowCommand = new GenericCommand<Models.Menu>((menu) =>
@@ -104,13 +135,14 @@ namespace ristorante_frontend.ViewModels
                 var window = new DishesWindow(viewModel);
 
                 window.ShowDialog();
+
+                _ = Initialize();
             });
         }
 
         public async Task Initialize()
         {
             var menuApiResult = await ApiService.GetMenus();
-            //var categoryApiResult = await ApiService.GetCategorie();
 
             if (menuApiResult.Data == null)
             {
