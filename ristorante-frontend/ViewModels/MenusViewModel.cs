@@ -97,22 +97,6 @@ namespace ristorante_frontend.ViewModels
                 Menus.Remove(menu);
             });
 
-            /*
-            this.RemoveDishIntoMenuCommand = new GenericCommand<Dish>(async (dish) =>
-            {
-                var updateApiResult = await ApiService.DeleteDishIntoMenu(SelectedMenu.Id, dish.Id);
-
-                if (updateApiResult.Data == 0)
-                {
-                    MessageBox.Show($"ERRORE! {updateApiResult.ErrorMessage}");
-                    return;
-                }
-
-                _ = Initialize();
-            });
-            */
-
-            //NON FUNZIA -> NON CALCOLARE IL CONVERTER
             this.RemoveDishIntoMenuCommand = new GenericCommand<Tuple<int,int>>(async (menuAndDishIds) =>
             {
                 int idMenu = menuAndDishIds.Item1;

@@ -78,7 +78,29 @@ namespace ristorante_frontend.ViewModels
                 return;
             }
 
-            Dishes = new ObservableCollection<Dish>(dishApiResult.Data);
+            var menuApiResult = await ApiService.GetMenuById(IdMenu);
+
+            if (menuApiResult.Data == null)
+            {
+                MessageBox.Show($"ERRORE! {menuApiResult.ErrorMessage}");
+                return;
+            }
+
+            List<Dish> dishes = dishApiResult.Data;
+
+            for (int i = 0; i < dishes.Count; i++)
+            {
+                foreach (int menuDishId in menuApiResult.Data.DishIds)
+                {
+                    if (dishes[i].Id == menuDishId)
+                    {
+                        dishes.Remove(dishes[i]);
+                        break;
+                    }
+                }
+            }
+
+            Dishes = new ObservableCollection<Dish>(dishes);
         }
 
         private void CloseWindow()

@@ -15,7 +15,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Content="SCEGLI UN PIATTO DA INSERIRE" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
+        <Label Grid.Row="0" Content="SCEGLI UN PIATTO DA INSERIRE NEL MENÙ" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" HorizontalContentAlignment="Center" />
         <ScrollViewer Grid.Row="1" Grid.Column="0" VerticalScrollBarVisibility="Hidden">
             <StackPanel>
                 <ListBox ItemsSource="{Binding Dishes}" HorizontalContentAlignment="Stretch" RenderTransformOrigin="0.568,0.564">

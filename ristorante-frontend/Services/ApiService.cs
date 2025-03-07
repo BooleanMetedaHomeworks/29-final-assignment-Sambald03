@@ -118,6 +118,22 @@ namespace ristorante_frontend.Services
             }
         }
 
+        public static async Task<ApiServiceResult<Menu>> GetMenuById(int id)
+        {
+            try
+            {
+                using HttpClient client = new HttpClient();
+                var httpResult = await client.GetAsync($"{API_URL}/Menu/{id}");
+                var resultBody = await httpResult.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<Menu>(resultBody);
+                return new ApiServiceResult<Menu>(data);
+            }
+            catch (Exception e)
+            {
+                return new ApiServiceResult<Menu>(e);
+            }
+        }
+
         public static async Task<ApiServiceResult<int>> CreateMenu(Menu menu)
         {
             try
