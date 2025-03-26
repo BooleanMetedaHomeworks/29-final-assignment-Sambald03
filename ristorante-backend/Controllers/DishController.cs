@@ -116,8 +116,8 @@ namespace ristorante_backend.Controllers
             }
         }
 
-        [HttpPost("{idMenu}")]
-        public async Task<IActionResult> CreateDishIntoMenu(int idMenu, [FromBody] Dish dish)
+        [HttpPost("{idMenu}/{idDish}")]
+        public async Task<IActionResult> CreateDishIntoMenu(int idMenu, int idDish)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace ristorante_backend.Controllers
                     return BadRequest(ModelState.Values);
                 }
 
-                int affectedRows = await this._dishRepository.InsertDishIntoMenu(idMenu, dish.Id);
+                int affectedRows = await this._dishRepository.InsertDishIntoMenu(idMenu, idDish);
 
                 return Ok(affectedRows);
             }
